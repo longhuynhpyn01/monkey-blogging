@@ -138,8 +138,6 @@ const PostDetailsPage = () => {
   if (!slug) return <PageNotFound></PageNotFound>;
   if (!postInfo.title) return null;
 
-  console.log("pótInfo:", postInfo);
-
   const date = postInfo?.createdAt?.seconds
     ? new Date(postInfo?.createdAt?.seconds * 1000)
     : new Date();

@@ -21,6 +21,7 @@ const menuLinks = [
 
 const HeaderStyles = styled.div`
   padding: 20px 0;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   .header-main {
     display: flex;
     align-items: center;
@@ -70,10 +71,15 @@ const HeaderStyles = styled.div`
     .logo {
       max-width: 30px;
     }
-    .menu,
+    /* .menu,
     .search,
     .header-button,
     .header-auth {
+      display: none;
+    } */
+  }
+  @media screen and (max-width: 499.98px) {
+    .menu {
       display: none;
     }
   }

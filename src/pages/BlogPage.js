@@ -1,21 +1,16 @@
 import Heading from "components/layout/Heading";
 import Layout from "components/layout/Layout";
 import { db } from "firebase-app/firebase-config";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import PostItem from "module/post/PostItem";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 const CategoryPage = () => {
   const [posts, setPosts] = useState([]);
-  const params = useParams();
 
   useEffect(() => {
     async function fetchData() {
-      const docRef = query(
-        collection(db, "posts"),
-        where("category.slug", "==", params.slug)
-      );
+      const docRef = collection(db, "posts");
       onSnapshot(docRef, (snapshot) => {
         const results = [];
         snapshot.forEach((doc) => {
@@ -28,17 +23,17 @@ const CategoryPage = () => {
       });
     }
     fetchData();
-  }, [params.slug]);
+  }, []);
 
   useEffect(() => {
-    if (params.slug) document.title = `Monkey Blogging - ${params.slug} posts`;
-  }, [params.slug]);
+    document.title = "Monkey Blogging - All posts";
+  }, []);
 
   return (
     <Layout>
       <div className="container">
         <div className="pt-10"></div>
-        <Heading className="capitalize">{params.slug} Posts</Heading>
+        <Heading className="capitalize">All Posts</Heading>
         {posts.length > 0 && (
           <div className="grid-layout grid-layout--secondary">
             {posts.map((item) => (

@@ -2,6 +2,7 @@ import { ActionDelete, ActionEdit, ActionView } from "components/action";
 import { Button } from "components/button";
 import { LabelStatus } from "components/label";
 import { Table } from "components/table";
+import { useAuth } from "contexts/auth-context";
 import { db } from "firebase-app/firebase-config";
 import {
   collection,
@@ -19,9 +20,9 @@ import DashboardHeading from "module/dashboard/DashboardHeading";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { postStatus } from "utils/constants";
+import { postStatus, userRole } from "utils/constants";
 
-const POST_PER_PAGE = 10;
+const POST_PER_PAGE = 100;
 
 const PostManage = () => {
   const [postList, setPostList] = useState([]);
@@ -29,10 +30,18 @@ const PostManage = () => {
   const [lastDoc, setLastDoc] = useState();
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
 
   useEffect(() => {
     async function fetchData() {
-      const colRef = collection(db, "posts");
+      // const colRef = collection(db, "posts");
+      const colRef =
+        userInfo.role !== userRole.ADMIN
+          ? query(
+              collection(db, "posts"),
+              where("user.email", "==", userInfo.email)
+            )
+          : collection(db, "posts");
       const newRef = filter
         ? query(
             colRef,
@@ -62,7 +71,7 @@ const PostManage = () => {
     }
 
     fetchData();
-  }, [filter]);
+  }, [filter, userInfo]);
 
   const renderPostStatus = (status) => {
     switch (status) {
@@ -72,7 +81,6 @@ const PostManage = () => {
         return <LabelStatus type="warning">Pending</LabelStatus>;
       case postStatus.REJECTED:
         return <LabelStatus type="danger">Rejected</LabelStatus>;
-
       default:
         break;
     }
@@ -101,11 +109,23 @@ const PostManage = () => {
   }, 250);
 
   const handleLoadMorePost = async () => {
+    const colRef =
+      userInfo.role !== userRole.ADMIN
+        ? query(
+            collection(db, "posts"),
+            where("user.email", "==", userInfo.email)
+          )
+        : collection(db, "posts");
     const nextRef = query(
-      collection(db, "posts"),
+      colRef,
       startAfter(lastDoc || 0),
       limit(POST_PER_PAGE)
     );
+    // const nextRef = query(
+    //   collection(db, "posts"),
+    //   startAfter(lastDoc || 0),
+    //   limit(POST_PER_PAGE)
+    // );
 
     onSnapshot(nextRef, (snapshot) => {
       let results = [];
@@ -127,16 +147,17 @@ const PostManage = () => {
     document.title = "Monkey Blogging - Manage post";
   }, []);
 
-  // const { userInfo } = useAuth();
-  // if (userInfo.role !== userRole.ADMIN) return null;
-
   return (
     <div>
       <DashboardHeading
         title="All posts"
         desc="Manage all posts"
       ></DashboardHeading>
-      <div className="mb-10 flex justify-end gap-5">
+      <div
+        className={`mb-10 flex justify-end gap-5 ${
+          userInfo.role !== userRole.ADMIN ? "hidden" : ""
+        }`}
+      >
         <div className="w-full max-w-[300px]">
           <input
             type="text"
@@ -167,7 +188,7 @@ const PostManage = () => {
 
               return (
                 <tr key={post.id}>
-                  <td>{post.id?.slice(0, 5) + "..."}</td>
+                  <td title={post?.id}>{post.id?.slice(0, 5) + "..."}</td>
                   <td className="!pr-[100px]">
                     <div className="flex items-center gap-x-3">
                       <img

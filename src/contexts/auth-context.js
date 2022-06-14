@@ -13,7 +13,6 @@ function AuthProvider(props) {
     // check được khi nào đăng nhập, khi nào đăng xuất
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("user:", user);
         const docRef = query(
           collection(db, "users"),
           where("email", "==", user.email)

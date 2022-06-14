@@ -10,7 +10,26 @@ const DashboardHeaderStyles = styled.div`
   border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 20px;
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .menu-toggle {
+    padding: 8px 12px;
+    font-size: 32px;
+    cursor: pointer;
+    border-radius: 12px;
+    &:hover {
+      background-color: ${(props) => props.theme.primary};
+      background: #f1fbf7;
+    }
+    @media screen and (min-width: 1024px) {
+      display: none;
+    }
+  }
   .logo {
     display: flex;
     align-items: center;
@@ -38,15 +57,22 @@ const DashboardHeaderStyles = styled.div`
   }
 `;
 
-const DashboardHeader = () => {
+const DashboardHeader = ({ onClick }) => {
   const { userInfo } = useAuth();
 
   return (
     <DashboardHeaderStyles>
-      <NavLink to="/" className="logo">
-        <img srcSet="/logo.png 2x" alt="monkey-blogging" className="logo" />
-        <span className="hidden lg:inline-block">Monkey Blogging</span>
-      </NavLink>
+      <div className="header-left">
+        <i
+          className="menu-toggle fa fa-bars"
+          aria-hidden="true"
+          onClick={onClick}
+        ></i>
+        <NavLink to="/" className="logo">
+          <img srcSet="/logo.png 2x" alt="monkey-blogging" className="logo" />
+          <span className="hidden md:inline-block">Monkey Blogging</span>
+        </NavLink>
+      </div>
       <div className="header-right">
         <Button to="/manage/add-post" className="header-button" height="52px">
           Write new post

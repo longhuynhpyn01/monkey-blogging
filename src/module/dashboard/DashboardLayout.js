@@ -1,10 +1,11 @@
 import { useAuth } from "contexts/auth-context";
 import PageNotFound from "pages/PageNotFound";
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import styled from "styled-components";
 import DashboardHeader from "./DashboardHeader";
 import Sidebar from "./Sidebar";
+import SidebarMobile from "./SidebarMobile";
 
 const DashboardStyles = styled.div`
   max-width: 1600px;
@@ -41,14 +42,18 @@ const DashboardStyles = styled.div`
 
 const DashboardLayout = () => {
   const { userInfo } = useAuth();
-  if (!userInfo) return <PageNotFound></PageNotFound>;
+  const [show, setShow] = useState(false);
 
-  console.log("userInfo:", userInfo);
+  if (!userInfo) return <PageNotFound></PageNotFound>;
 
   return (
     <DashboardStyles>
-      <DashboardHeader></DashboardHeader>
-      <div className="dashboard-main">
+      <DashboardHeader onClick={() => setShow(!show)}></DashboardHeader>
+      <div className="dashboard-main relative">
+        <SidebarMobile
+          onShow={show}
+          onClose={() => setShow(false)}
+        ></SidebarMobile>
         <Sidebar></Sidebar>
         <div className="dashboard-children">
           <Outlet></Outlet>

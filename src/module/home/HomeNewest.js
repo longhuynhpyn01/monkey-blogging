@@ -60,7 +60,6 @@ const HomeNewest = () => {
     });
   }, []);
 
-  console.log("posts:", posts);
   if (posts.length <= 0) return null;
   const [first, ...other] = posts;
 
@@ -78,12 +77,12 @@ const HomeNewest = () => {
             </div>
           )}
         </div>
-        <div className="grid-layout grid-layout--primary">
+        {/* <div className="grid-layout grid-layout--primary">
           <PostItem></PostItem>
           <PostItem></PostItem>
           <PostItem></PostItem>
           <PostItem></PostItem>
-        </div>
+        </div> */}
       </div>
     </HomeNewestStyles>
   );

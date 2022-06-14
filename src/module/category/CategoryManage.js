@@ -2,6 +2,7 @@ import { ActionDelete, ActionEdit, ActionView } from "components/action";
 import { Button } from "components/button";
 import { LabelStatus } from "components/label";
 import { Table } from "components/table";
+import { useAuth } from "contexts/auth-context";
 import { db } from "firebase-app/firebase-config";
 import {
   collection,
@@ -19,9 +20,9 @@ import DashboardHeading from "module/dashboard/DashboardHeading";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { categoryStatus } from "utils/constants";
+import { categoryStatus, userRole } from "utils/constants";
 
-const CATEGORY_PER_PAGE = 10;
+const CATEGORY_PER_PAGE = 100;
 
 const CategoryManage = () => {
   const navigate = useNavigate();
@@ -116,6 +117,20 @@ const CategoryManage = () => {
     document.title = "Monkey Blogging - Manage category";
   }, []);
 
+  const { userInfo } = useAuth();
+  if (userInfo.role !== userRole.ADMIN)
+    return (
+      <div>
+        <DashboardHeading
+          title="Users"
+          desc="Manage your user"
+        ></DashboardHeading>
+        <p className="text-base mx-auto mb-5">
+          Your role cannot access this page
+        </p>
+      </div>
+    );
+
   return (
     <div>
       <DashboardHeading title="Categories" desc="Manage your category">
@@ -145,7 +160,7 @@ const CategoryManage = () => {
           {categoryList.length > 0 &&
             categoryList.map((category) => (
               <tr key={category.id}>
-                <td>{category.id?.slice(0, 5) + "..."}</td>
+                <td title={category.id}>{category.id?.slice(0, 5) + "..."}</td>
                 <td>{category.name}</td>
                 <td>
                   <span className="italic text-gray-400">{category.slug}</span>

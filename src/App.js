@@ -3,7 +3,10 @@ import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "contexts/auth-context";
 
 const HomePage = React.lazy(() => import("pages/HomePage"));
+const AuthorPage = React.lazy(() => import("pages/AuthorPage"));
+const BlogPage = React.lazy(() => import("pages/BlogPage"));
 const CategoryPage = React.lazy(() => import("pages/CategoryPage"));
+const ContactPage = React.lazy(() => import("pages/ContactPage"));
 const DashboardPage = React.lazy(() => import("pages/DashboardPage"));
 const SignInPage = React.lazy(() => import("pages/SignInPage"));
 const SignUpPage = React.lazy(() => import("./pages/SignUpPage"));
@@ -39,13 +42,21 @@ function App() {
             <Route path="/sign-up" element={<SignUpPage></SignUpPage>}></Route>
             <Route path="/sign-in" element={<SignInPage></SignInPage>}></Route>
             <Route path="*" element={<PageNotFound></PageNotFound>}></Route>
+            <Route path="/blog" element={<BlogPage></BlogPage>}></Route>
+            <Route
+              path="/contact"
+              element={<ContactPage></ContactPage>}
+            ></Route>
+            <Route
+              path="/author/:username"
+              element={<AuthorPage></AuthorPage>}
+            ></Route>
             <Route
               path="/category/:slug"
               element={<CategoryPage></CategoryPage>}
             ></Route>
             <Route
               path="/post/:slug"
-              // path="/:slug"
               element={<PostDetailsPage></PostDetailsPage>}
             ></Route>
             <Route element={<DashboardLayout></DashboardLayout>}>
