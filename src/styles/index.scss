@@ -1,0 +1,141 @@
+@import "reset";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "content";
+
+@layer base {
+  body {
+    line-height: 1.5;
+    // -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    font-family: "Epilogue", sans-serif;
+    font-size: 16px;
+    color: #232323;
+  }
+}
+
+// .quill > .ql-toolbar:first-child {
+//   display: none !important;
+// }
+
+.container {
+  width: 100%;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+.text-primary {
+  color: #a4d96c;
+}
+.grid-layout {
+  display: grid;
+  grid-auto-columns: 235px; // xác định kích thước độ dài (width) cột của bất kỳ implicit grid cells nếu không bị ghi đè, Implicit Tracks
+  gap: 20px;
+  -ms-overflow-style: none;
+  scrollbar-width: none; // kiểm soát chiều rộng hoặc "độ dày" của thanh cuộn với none thì sẽ ẩn thanh cuộn nhưng vẫn scroll được
+  &::-webkit-scrollbar {
+    // không hiện thanh cuộn
+    display: none;
+  }
+  @media screen and (min-width: 1024px) {
+    // ưu tiên hơn grid-auto-columns
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+  }
+  @media screen and (max-width: 1023.98px) {
+    // muốn các cột đều nằm trên một hàng và tạo thành nhiều cột khác cho dù ban đầu bạn chỉ set có 3 cột mà thôi
+    // thì cũng tương tự chúng ta sử dụng thuộc tính grid-auto-flow: column kết hợp grid-auto-columns để xét width của phần tử
+    grid-auto-flow: column;
+    // tăng trải nghiệm user khi scroll trên mobile
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+  }
+
+  & > * {
+    scroll-snap-align: start; // khi user scroll ngang thì các item luôn nằm về bên trái khi có mandatory
+  }
+  &--primary {
+    grid-auto-columns: 220px;
+    @media screen and (min-width: 1024px) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+}
+.home-block {
+  padding-bottom: 40px;
+  @media screen and (min-width: 1024px) {
+    padding-bottom: 60px;
+  }
+}
+
+// body::-webkit-scrollbar {
+//   width: 10px;
+//   height: 10px;
+// }
+
+// // cái thanh mà ta nhấn vào để kéo
+// body::-webkit-scrollbar-thumb {
+//   // background-image: linear-gradient(-45deg, #a4d96c, #2ebac1);
+//   background-color: #8d949e;
+//   border-radius: 100rem;
+// }
+
+// // cái thanh nền ở dưới
+// body::-webkit-scrollbar-track {
+//   background-color: #fafafa;
+// }
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+// cái thanh mà ta nhấn vào để kéo
+*::-webkit-scrollbar-thumb {
+  // background-image: linear-gradient(-45deg, #a4d96c, #2ebac1);
+  background-color: #8d949e;
+  border-radius: 100rem;
+}
+
+// cái thanh nền ở dưới
+*::-webkit-scrollbar-track {
+  background-color: #fafafa;
+}
+
+.hidden-input {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap;
+}
+
+.form-layout {
+  @apply grid grid-cols-1 mb-5 lg:grid-cols-2 lg:gap-x-10 lg:mb-10;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  box-shadow: 0 0 0 30px white inset;
+}
+
+.quill {
+  position: relative;
+  .ql-toolbar {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+  }
+}
