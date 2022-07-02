@@ -325,15 +325,15 @@ const PostAddNew = () => {
             </div>
           </Field>
         </div>
-        <div className="form-layout">
-          <Field>
-            <Label>Feature post</Label>
-            <Toggle
-              on={watchHot === true}
-              onClick={() => setValue("hot", !watchHot)}
-            ></Toggle>
-          </Field>
-          {userInfo.role === userRole.ADMIN && (
+        {userInfo.role === userRole.ADMIN && (
+          <div className="form-layout">
+            <Field>
+              <Label>Feature post</Label>
+              <Toggle
+                on={watchHot === true}
+                onClick={() => setValue("hot", !watchHot)}
+              ></Toggle>
+            </Field>
             <Field>
               <Label>Status</Label>
               <FieldCheckboxes>
@@ -363,8 +363,8 @@ const PostAddNew = () => {
                 </Radio>
               </FieldCheckboxes>
             </Field>
-          )}
-        </div>
+          </div>
+        )}
         <Button
           type="submit"
           className="mx-auto w-[250px]"

@@ -1,11 +1,9 @@
 import { Button } from "components/button";
-import { Radio } from "components/checkbox";
 import { Dropdown } from "components/dropdown";
-import { Field, FieldCheckboxes } from "components/field";
+import { Field } from "components/field";
 import ImageUpload from "components/image/ImageUpload";
 import { Input } from "components/input";
 import { Label } from "components/label";
-import Toggle from "components/toggle/Toggle";
 import { db } from "firebase-app/firebase-config";
 import {
   collection,
@@ -22,7 +20,6 @@ import DashboardHeading from "module/dashboard/DashboardHeading";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { postStatus, userRole } from "utils/constants";
 import { toast } from "react-toastify";
 import slugify from "slugify";
 import * as yup from "yup";
@@ -32,8 +29,7 @@ import "react-quill/dist/quill.snow.css";
 import ImageUploader from "quill-image-uploader";
 import axios from "axios";
 import { imgbbAPI } from "config/apiConfig";
-import Swal from "sweetalert2";
-import { useAuth } from "contexts/auth-context";
+import Toggle from "components/toggle/Toggle";
 Quill.register("modules/imageUploader", ImageUploader);
 
 const schema = yup.object({
@@ -45,14 +41,13 @@ const schema = yup.object({
 });
 
 const PostUpdate = () => {
-  const { userInfo } = useAuth();
   const [params] = useSearchParams();
   const postId = params.get("id");
   const {
     handleSubmit,
     control,
-    setValue,
     watch,
+    setValue,
     reset,
     getValues,
     formState: { isValid, isSubmitting, errors },
@@ -62,7 +57,6 @@ const PostUpdate = () => {
   });
   const navigate = useNavigate();
   const watchHot = watch("hot");
-  const watchStatus = watch("status");
   const imageUrl = getValues("image");
   const imageName = getValues("image_name");
   const { image, setImage, progress, handleSelectImage, handleDeleteImage } =
@@ -73,11 +67,6 @@ const PostUpdate = () => {
   const [posts, setPosts] = useState([]);
 
   async function deletePostImage() {
-    if (userInfo?.role !== userRole.ADMIN) {
-      Swal.fire("Failed", "You have no right to do this action", "warning");
-      return;
-    }
-
     const colRef = doc(db, "users", postId);
     await updateDoc(colRef, {
       image: "",
@@ -160,11 +149,6 @@ const PostUpdate = () => {
 
   const updatePostHandler = async (values) => {
     if (!isValid) return;
-
-    if (userInfo?.role !== userRole.ADMIN) {
-      Swal.fire("Failed", "You have no right to do this action", "warning");
-      return;
-    }
 
     const newValues = { ...values };
     newValues.slug = slugify(values.slug || values.title, {
@@ -318,39 +302,7 @@ const PostUpdate = () => {
         <div className="form-layout">
           <Field>
             <Label>Feature post</Label>
-            <Toggle
-              on={watchHot === true}
-              onClick={() => setValue("hot", !watchHot)}
-            ></Toggle>
-          </Field>
-          <Field>
-            <Label>Status</Label>
-            <FieldCheckboxes>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === postStatus.APPROVED}
-                value={postStatus.APPROVED}
-              >
-                Approved
-              </Radio>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === postStatus.PENDING}
-                value={postStatus.PENDING}
-              >
-                Pending
-              </Radio>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === postStatus.REJECTED}
-                value={postStatus.REJECTED}
-              >
-                Reject
-              </Radio>
-            </FieldCheckboxes>
+            <Toggle on={watchHot === true}></Toggle>
           </Field>
         </div>
         <Button

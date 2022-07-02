@@ -1,4 +1,5 @@
 import { Button } from "components/button";
+import { useAuth } from "contexts/auth-context";
 import React from "react";
 import styled from "styled-components";
 
@@ -54,6 +55,8 @@ const HomeBannerStyles = styled.div`
 `;
 
 const HomeBanner = () => {
+  const { userInfo } = useAuth();
+
   return (
     <HomeBannerStyles>
       <div className="container">
@@ -68,7 +71,11 @@ const HomeBanner = () => {
               Business... It is the elevated form of our common saying "sharing
               is caring". 🧡
             </p>
-            <Button to="/sign-up" kind="secondary" className="banner-button">
+            <Button
+              to={userInfo ? "/dashboard" : "/sign-up"}
+              kind="secondary"
+              className="banner-button"
+            >
               Get started
             </Button>
           </div>

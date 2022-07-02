@@ -51,7 +51,6 @@ const AuthorPage = () => {
   }, [user.fullname]);
 
   if (user && Object.keys(user).length === 0) {
-    //  return <PageNotFound></PageNotFound>;
     return null;
   }
 
