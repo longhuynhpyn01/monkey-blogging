@@ -1,6 +1,7 @@
 import { db } from "firebase-app/firebase-config";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const AuthorBox = ({ userId = "" }) => {
   const [user, setUser] = useState({});
@@ -24,7 +25,9 @@ const AuthorBox = ({ userId = "" }) => {
         <img src={user?.avatar} alt="user-avatar" />
       </div>
       <div className="author-content">
-        <h3 className="author-name">{user?.fullname}</h3>
+        <Link to={`/author/${user?.username}`}>
+          <h3 className="author-name">{user?.fullname}</h3>
+        </Link>
         <p className="author-desc">{user?.description}</p>
       </div>
     </div>

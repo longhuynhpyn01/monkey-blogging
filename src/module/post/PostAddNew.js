@@ -7,7 +7,7 @@ import { Label } from "components/label";
 import React, { useState, useEffect, Fragment, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import slugify from "slugify";
-import { postStatus } from "utils/constants";
+import { postStatus, userRole } from "utils/constants";
 import ImageUpload from "components/image/ImageUpload";
 import useFirebaseImage from "hooks/useFirebaseImage";
 import Toggle from "components/toggle/Toggle";
@@ -34,6 +34,7 @@ import "react-quill/dist/quill.snow.css";
 import ImageUploader from "quill-image-uploader";
 import axios from "axios";
 import { imgbbAPI } from "config/apiConfig";
+// import Swal from "sweetalert2";
 Quill.register("modules/imageUploader", ImageUploader);
 
 const schema = yup.object({
@@ -165,6 +166,11 @@ const PostAddNew = () => {
 
   const addPostHandler = async (values) => {
     if (!isValid) return;
+
+    // if (userInfo?.role !== userRole.ADMIN) {
+    //   Swal.fire("Failed", "You have no right to do this action", "warning");
+    //   return;
+    // }
 
     const newValues = { ...values };
     newValues.slug = slugify(values.slug || values.title, {
@@ -327,35 +333,37 @@ const PostAddNew = () => {
               onClick={() => setValue("hot", !watchHot)}
             ></Toggle>
           </Field>
-          <Field>
-            <Label>Status</Label>
-            <FieldCheckboxes>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === postStatus.APPROVED}
-                value={postStatus.APPROVED}
-              >
-                Approved
-              </Radio>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === postStatus.PENDING}
-                value={postStatus.PENDING}
-              >
-                Pending
-              </Radio>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === postStatus.REJECTED}
-                value={postStatus.REJECTED}
-              >
-                Reject
-              </Radio>
-            </FieldCheckboxes>
-          </Field>
+          {userInfo.role === userRole.ADMIN && (
+            <Field>
+              <Label>Status</Label>
+              <FieldCheckboxes>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === postStatus.APPROVED}
+                  value={postStatus.APPROVED}
+                >
+                  Approved
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === postStatus.PENDING}
+                  value={postStatus.PENDING}
+                >
+                  Pending
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === postStatus.REJECTED}
+                  value={postStatus.REJECTED}
+                >
+                  Reject
+                </Radio>
+              </FieldCheckboxes>
+            </Field>
+          )}
         </div>
         <Button
           type="submit"

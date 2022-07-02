@@ -11,18 +11,6 @@ const UserManage = () => {
   }, []);
 
   const { userInfo } = useAuth();
-  if (userInfo.role !== userRole.ADMIN)
-    return (
-      <div>
-        <DashboardHeading
-          title="Users"
-          desc="Manage your user"
-        ></DashboardHeading>
-        <p className="text-base mx-auto mb-5">
-          Your role cannot access this page
-        </p>
-      </div>
-    );
 
   return (
     <div>
@@ -31,7 +19,11 @@ const UserManage = () => {
         desc="Manage your user"
       ></DashboardHeading>
       <div className="flex justify-end mb-10">
-        <Button kind="ghost" to="/manage/add-user">
+        <Button
+          kind="ghost"
+          to="/manage/add-user"
+          className={userInfo.role !== userRole.ADMIN ? "hidden" : ""}
+        >
           Add new user
         </Button>
       </div>

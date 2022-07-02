@@ -8,11 +8,11 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import PageNotFound from "./PageNotFound";
-import parse from "html-react-parser";
+// import parse from "html-react-parser";
 import AuthorBox from "components/author/AuthorBox";
 import PostRelated from "module/post/PostRelated";
 import { useAuth } from "contexts/auth-context";
-import { userRole } from "utils/constants";
+import { postStatus, userRole } from "utils/constants";
 import slugify from "slugify";
 
 const PostDetailsPageStyles = styled.div`
@@ -94,9 +94,28 @@ const PostDetailsPageStyles = styled.div`
     }
     .author {
       flex-direction: column;
+      max-width: 75%;
+      margin: 40px auto;
+      background-color: inherit;
       &-image {
-        width: 100%;
-        height: auto;
+        margin: 0 auto;
+        width: 300px;
+        height: 300px;
+        border-radius: 100rem;
+      }
+      &-content {
+        margin-top: 20px;
+        background-color: ${(props) => props.theme.grayF3};
+        border-radius: inherit;
+      }
+    }
+  }
+  @media screen and (max-width: 767.98px) {
+    .author {
+      max-width: 85%;
+      &-image {
+        width: 200px;
+        height: 200px;
       }
     }
   }
@@ -143,6 +162,13 @@ const PostDetailsPage = () => {
     : new Date();
   const formatDate = new Date(date).toLocaleDateString("vi-VI");
 
+  if (
+    userInfo.role !== userRole.ADMIN &&
+    Number(postInfo.status) !== postStatus.APPROVED
+  ) {
+    return <PageNotFound></PageNotFound>;
+  }
+
   return (
     <PostDetailsPageStyles>
       <Layout>
@@ -173,8 +199,13 @@ const PostDetailsPage = () => {
             </div>
           </div>
           <div className="post-content">
-            <div className="entry-content">
-              {parse(postInfo?.content || "")}
+            <div
+              className="entry-content"
+              dangerouslySetInnerHTML={{
+                __html: postInfo?.content || "",
+              }}
+            >
+              {/* {parse(postInfo?.content || "")} */}
             </div>
             <AuthorBox userId={postInfo?.user?.id}></AuthorBox>
           </div>

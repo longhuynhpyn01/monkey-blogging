@@ -91,8 +91,8 @@ const SignUpPage = () => {
           username: newValues.username,
           avatar: "",
           description: "",
-          status: userStatus.ACTIVE,
-          role: userRole.USER,
+          status: Number(userStatus.ACTIVE),
+          role: Number(userRole.USER),
           createdAt: serverTimestamp(),
         });
 

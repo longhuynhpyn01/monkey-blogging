@@ -2,16 +2,18 @@ import Heading from "components/layout/Heading";
 import { db } from "firebase-app/firebase-config";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { postStatus } from "utils/constants";
 import PostItem from "./PostItem";
 
 const PostRelated = ({ categoryId = "" }) => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    const docRef = query(
+    let docRef = query(
       collection(db, "posts"),
       where("category.id", "==", categoryId)
     );
+    docRef = query(docRef, where("status", "==", postStatus.APPROVED));
     onSnapshot(docRef, (snapshot) => {
       const results = [];
       snapshot.forEach((doc) => {

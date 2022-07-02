@@ -51,6 +51,7 @@ const Button = ({
   onClick = () => {},
   children,
   kind = "primary",
+  className = "",
   ...props
 }) => {
   const { isLoading, to } = props;
@@ -58,7 +59,7 @@ const Button = ({
 
   if (to !== "" && typeof to === "string") {
     return (
-      <NavLink to={to} className="inline-block">
+      <NavLink to={to} className={`inline-block ${className}`}>
         <ButtonStyles type={type} kind={kind} {...props}>
           {child}
         </ButtonStyles>

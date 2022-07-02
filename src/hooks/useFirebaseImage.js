@@ -1,3 +1,4 @@
+// import { useAuth } from "contexts/auth-context";
 import {
   deleteObject,
   getDownloadURL,
@@ -6,6 +7,8 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { useState } from "react";
+// import Swal from "sweetalert2";
+// import { userRole } from "utils/constants";
 
 export default function useFirebaseImage(
   setValue,
@@ -13,12 +16,18 @@ export default function useFirebaseImage(
   imageName = null,
   cb = null
 ) {
+  // const { userInfo } = useAuth();
   const [progress, setProgress] = useState(0); // lưu thanh progress khi upload hình ảnh
   const [image, setImage] = useState(""); // lưu đường dẫn image khi upload xong
 
   if (!setValue || !getValues) return;
 
   const handleUploadImage = (file) => {
+    // if (userInfo?.role !== userRole.ADMIN) {
+    //   Swal.fire("Failed", "You have no right to do this action", "warning");
+    //   return;
+    // }
+
     const storage = getStorage();
     // Upload file sẽ lưu đường dẫn 'images/mountains.jpg' ở trên firebase Storage
     const storageRef = ref(storage, "images/" + file.name);
@@ -73,6 +82,11 @@ export default function useFirebaseImage(
 
   // xóa image đang được upload
   const handleDeleteImage = () => {
+    // if (userInfo?.role !== userRole.ADMIN) {
+    //   Swal.fire("Failed", "You have no right to do this action", "warning");
+    //   return;
+    // }
+
     const storage = getStorage();
     const imageRef = ref(
       storage,

@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { postStatus, userRole } from "utils/constants";
 
-const POST_PER_PAGE = 100;
+const POST_PER_PAGE = 1000;
 
 const PostManage = () => {
   const [postList, setPostList] = useState([]);
@@ -87,6 +87,11 @@ const PostManage = () => {
   };
 
   async function handleDeletePost(postId) {
+    // if (userInfo?.role !== userRole.ADMIN) {
+    //   Swal.fire("Failded", "You have no right to do this action", "warning");
+    //   return;
+    // }
+
     const docRef = doc(db, "posts", postId);
     Swal.fire({
       title: "Are you sure?",
@@ -97,9 +102,11 @@ const PostManage = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
-      if (result.isConfirmed) {
+      if (result.isConfirmed && userInfo?.role === userRole.ADMIN) {
         await deleteDoc(docRef);
         Swal.fire("Deleted!", "Your post has been deleted.", "success");
+      } else {
+        Swal.fire("Failed!", "You have no right to delete post", "warning");
       }
     });
   }

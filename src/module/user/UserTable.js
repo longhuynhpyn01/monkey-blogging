@@ -1,6 +1,7 @@
-import { ActionDelete, ActionEdit } from "components/action";
+import { ActionDelete, ActionEdit, ActionView } from "components/action";
 import { LabelStatus } from "components/label";
 import { Table } from "components/table";
+import { useAuth } from "contexts/auth-context";
 import { db } from "firebase-app/firebase-config";
 import { collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
@@ -12,20 +13,35 @@ import { userRole, userStatus } from "utils/constants";
 const UserTable = () => {
   const [userList, setUserList] = useState([]);
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
 
   useEffect(() => {
-    const colRef = collection(db, "users");
-    onSnapshot(colRef, (snapshot) => {
-      const results = [];
-      snapshot.forEach((doc) => {
-        results.push({
-          id: doc.id,
-          ...doc.data(),
+    if (userInfo?.role !== userRole.ADMIN) {
+      if (JSON.stringify(userInfo) !== "{}") {
+        const colRef = doc(db, "users", userInfo.uid);
+        onSnapshot(colRef, (doc) => {
+          const results = [];
+          results.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+          setUserList(results);
         });
+      }
+    } else {
+      const colRef = collection(db, "users");
+      onSnapshot(colRef, (snapshot) => {
+        const results = [];
+        snapshot.forEach((doc) => {
+          results.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+        setUserList(results);
       });
-      setUserList(results);
-    });
-  }, []);
+    }
+  }, [userInfo]);
 
   const renderRoleLabel = (role) => {
     switch (role) {
@@ -54,6 +70,10 @@ const UserTable = () => {
   };
 
   const handleDeleteUser = async (user) => {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
     const colRef = doc(db, "users", user.id);
 
     Swal.fire({
@@ -69,7 +89,7 @@ const UserTable = () => {
         await deleteDoc(colRef); // xóa trong database
         // await deleteUser(user); // xóa trong authenticate nhưng yêu cầu đăng nhập mới xóa được
         toast.success("Delete user successfully");
-        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        Swal.fire("Deleted!", "The user has been deleted.", "success");
       }
     });
   };
@@ -101,10 +121,16 @@ const UserTable = () => {
         <td>{renderRoleLabel(Number(user.role))}</td>
         <td>
           <div className="flex items-center gap-x-3 text-gray-500">
+            <ActionView
+              onClick={() => navigate(`/author/${user.username}`)}
+            ></ActionView>
             <ActionEdit
               onClick={() => navigate(`/manage/update-user?id=${user.id}`)}
             ></ActionEdit>
-            <ActionDelete onClick={() => handleDeleteUser(user)}></ActionDelete>
+            <ActionDelete
+              onClick={() => handleDeleteUser(user)}
+              className={userInfo.role !== userRole.ADMIN ? "hidden" : ""}
+            ></ActionDelete>
           </div>
         </td>
       </tr>

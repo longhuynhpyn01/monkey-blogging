@@ -17,9 +17,11 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import slugify from "slugify";
-import { categoryStatus } from "utils/constants";
+import { categoryStatus, userRole } from "utils/constants";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Swal from "sweetalert2";
+import { useAuth } from "contexts/auth-context";
 
 const schema = yup.object({
   name: yup.string().required("Please enter the category name"),
@@ -47,9 +49,15 @@ const CategoryUpdate = () => {
   const watchStatus = watch("status");
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
 
   const handleUpdateCategory = async (values) => {
     if (!isValid) return;
+
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
 
     const newValues = { ...values };
     newValues.slug = slugify(newValues.slug || newValues.name, {

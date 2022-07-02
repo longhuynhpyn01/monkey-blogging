@@ -23,6 +23,8 @@ import { userRole, userStatus } from "utils/constants";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import slugify from "slugify";
+import Swal from "sweetalert2";
+import { useAuth } from "contexts/auth-context";
 
 const schema = yup.object({
   fullname: yup
@@ -77,9 +79,15 @@ const UserUpdate = () => {
   const imageName = imageRegex?.length > 0 ? imageRegex[1] : "";
   const { image, setImage, progress, handleSelectImage, handleDeleteImage } =
     useFirebaseImage(setValue, getValues, imageName, deleteAvatar);
+  const { userInfo } = useAuth();
 
   const handleUpdateUser = async (values) => {
     if (!isValid) return;
+
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
 
     const newValues = { ...values };
     newValues.username = slugify(newValues.username || newValues.fullname, {

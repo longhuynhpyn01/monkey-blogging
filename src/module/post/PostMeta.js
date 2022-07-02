@@ -24,12 +24,7 @@ const PostMetaStyles = styled.div`
   }
 `;
 
-const PostMeta = ({
-  date = "Mar 23",
-  authorName = "Andiez Le",
-  className = "",
-  to = "",
-}) => {
+const PostMeta = ({ date = "", authorName = "", className = "", to = "" }) => {
   return (
     <PostMetaStyles className={`post-meta ${className}`}>
       <span className="post-time">{date}</span>

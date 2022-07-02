@@ -25,6 +25,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Textarea } from "components/textarea";
 import { useNavigate } from "react-router-dom";
 import InputPasswordToggle from "components/input/InputPasswordToggle";
+import Swal from "sweetalert2";
+import { useAuth } from "contexts/auth-context";
 
 const schema = yup.object({
   fullname: yup
@@ -80,9 +82,15 @@ const UserAddNew = () => {
     handleDeleteImage,
     handleResetUpload,
   } = useFirebaseImage(setValue, getValues);
+  const { userInfo } = useAuth();
 
   const handleCreateUser = async (values) => {
     if (!isValid) return;
+
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
 
     const newValues = { ...values };
     newValues.username = slugify(newValues.username || newValues.fullname, {

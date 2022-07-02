@@ -15,21 +15,22 @@ import {
   startAfter,
   where,
 } from "firebase/firestore";
-import { debounce } from "lodash";
+// import { debounce } from "lodash";
 import DashboardHeading from "module/dashboard/DashboardHeading";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { categoryStatus, userRole } from "utils/constants";
 
-const CATEGORY_PER_PAGE = 100;
+const CATEGORY_PER_PAGE = 1000;
 
 const CategoryManage = () => {
   const navigate = useNavigate();
   const [categoryList, setCategoryList] = useState([]);
-  const [filter, setFilter] = useState("");
+  const [filter] = useState("");
   const [lastDoc, setLastDoc] = useState(); // lưu document cuối cùng ở mỗi lần ở nhấn load more
   const [total, setTotal] = useState(0); // lưu tổng số lượng danh mục hiện có trong firestore
+  const { userInfo } = useAuth();
 
   useEffect(() => {
     async function fetchData() {
@@ -67,6 +68,11 @@ const CategoryManage = () => {
   }, [filter]);
 
   const handleDeleteCategory = async (docId) => {
+    if (userInfo?.role !== userRole.ADMIN) {
+      Swal.fire("Failed", "You have no right to do this action", "warning");
+      return;
+    }
+
     const colRef = doc(db, "categories", docId); // lấy 1 document từ collection categories với docId
     Swal.fire({
       title: "Are you sure?",
@@ -84,9 +90,9 @@ const CategoryManage = () => {
     });
   };
 
-  const handleInputFilter = debounce((e) => {
-    setFilter(e.target.value);
-  }, 500);
+  // const handleInputFilter = debounce((e) => {
+  //   setFilter(e.target.value);
+  // }, 500);
 
   const handleLoadMoreCategory = async () => {
     // query kết quả kết tiếp từ lastDoc
@@ -117,79 +123,87 @@ const CategoryManage = () => {
     document.title = "Monkey Blogging - Manage category";
   }, []);
 
-  const { userInfo } = useAuth();
-  if (userInfo.role !== userRole.ADMIN)
-    return (
-      <div>
-        <DashboardHeading
-          title="Users"
-          desc="Manage your user"
-        ></DashboardHeading>
-        <p className="text-base mx-auto mb-5">
-          Your role cannot access this page
-        </p>
-      </div>
-    );
-
   return (
     <div>
       <DashboardHeading title="Categories" desc="Manage your category">
-        <Button kind="ghost" height="60px" to="/manage/add-category">
+        <Button
+          kind="ghost"
+          height="60px"
+          to="/manage/add-category"
+          className={userInfo.role !== userRole.ADMIN ? "hidden" : ""}
+        >
           Create category
         </Button>
       </DashboardHeading>
-      <div className="flex justify-end mb-10">
-        <input
-          type="text"
-          placeholder="Search category..."
-          className="px-5 py-4 border border-gray-300 rounded-lg outline-none"
-          onChange={handleInputFilter}
-        />
-      </div>
       <Table>
         <thead>
           <tr>
             <th>Id</th>
             <th>Name</th>
             <th>Slug</th>
-            <th>Status</th>
+            {userInfo.role === userRole.ADMIN && <th>Status</th>}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {categoryList.length > 0 &&
-            categoryList.map((category) => (
-              <tr key={category.id}>
-                <td title={category.id}>{category.id?.slice(0, 5) + "..."}</td>
-                <td>{category.name}</td>
-                <td>
-                  <span className="italic text-gray-400">{category.slug}</span>
-                </td>
-                <td>
-                  {Number(category.status) === categoryStatus.APPROVED && (
-                    <LabelStatus type="success">Approved</LabelStatus>
-                  )}
-                  {Number(category.status) === categoryStatus.UNAPPROVED && (
-                    <LabelStatus type="warning">Unapproved</LabelStatus>
-                  )}
-                </td>
-                <td>
-                  <div className="flex items-center gap-x-3 text-gray-500">
-                    <ActionView
-                      onClick={() => navigate(`/category/${category.slug}`)}
-                    ></ActionView>
-                    <ActionEdit
-                      onClick={() =>
-                        navigate(`/manage/update-category?id=${category.id}`)
-                      }
-                    ></ActionEdit>{" "}
-                    <ActionDelete
-                      onClick={() => handleDeleteCategory(category.id)}
-                    ></ActionDelete>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            categoryList.map((category) => {
+              if (
+                (userInfo.role !== userRole.ADMIN &&
+                  Number(category.status) === categoryStatus.APPROVED) ||
+                userInfo.role === userRole.ADMIN
+              )
+                return (
+                  <tr key={category.id}>
+                    <td title={category.id}>
+                      {category.id?.slice(0, 5) + "..."}
+                    </td>
+                    <td>{category.name}</td>
+                    <td>
+                      <span className="italic text-gray-400">
+                        {category.slug}
+                      </span>
+                    </td>
+                    {userInfo.role === userRole.ADMIN && (
+                      <td>
+                        {Number(category.status) ===
+                          categoryStatus.APPROVED && (
+                          <LabelStatus type="success">Approved</LabelStatus>
+                        )}
+                        {Number(category.status) ===
+                          categoryStatus.UNAPPROVED && (
+                          <LabelStatus type="warning">Unapproved</LabelStatus>
+                        )}
+                      </td>
+                    )}
+
+                    <td>
+                      <div className="flex items-center gap-x-3 text-gray-500">
+                        <ActionView
+                          onClick={() => navigate(`/category/${category.slug}`)}
+                        ></ActionView>
+                        <ActionEdit
+                          onClick={() =>
+                            navigate(
+                              `/manage/update-category?id=${category.id}`
+                            )
+                          }
+                          className={
+                            userInfo.role !== userRole.ADMIN ? "hidden" : ""
+                          }
+                        ></ActionEdit>
+                        <ActionDelete
+                          onClick={() => handleDeleteCategory(category.id)}
+                          className={
+                            userInfo.role !== userRole.ADMIN ? "hidden" : ""
+                          }
+                        ></ActionDelete>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              return null;
+            })}
         </tbody>
       </Table>
       {total > categoryList.length && (
@@ -197,7 +211,6 @@ const CategoryManage = () => {
           <Button onClick={handleLoadMoreCategory} className="mx-auto">
             Load more
           </Button>
-          {/* {total} */}
         </div>
       )}
     </div>
