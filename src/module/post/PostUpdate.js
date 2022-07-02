@@ -1,6 +1,6 @@
 import { Button } from "components/button";
 import { Dropdown } from "components/dropdown";
-import { Field } from "components/field";
+import { Field, FieldCheckboxes } from "components/field";
 import ImageUpload from "components/image/ImageUpload";
 import { Input } from "components/input";
 import { Label } from "components/label";
@@ -30,6 +30,9 @@ import ImageUploader from "quill-image-uploader";
 import axios from "axios";
 import { imgbbAPI } from "config/apiConfig";
 import Toggle from "components/toggle/Toggle";
+import { postStatus, userRole } from "utils/constants";
+import { useAuth } from "contexts/auth-context";
+import { Radio } from "components/checkbox";
 Quill.register("modules/imageUploader", ImageUploader);
 
 const schema = yup.object({
@@ -41,6 +44,7 @@ const schema = yup.object({
 });
 
 const PostUpdate = () => {
+  const { userInfo } = useAuth();
   const [params] = useSearchParams();
   const postId = params.get("id");
   const {
@@ -56,6 +60,7 @@ const PostUpdate = () => {
     mode: "onChange",
   });
   const navigate = useNavigate();
+  const watchStatus = watch("status");
   const watchHot = watch("hot");
   const imageUrl = getValues("image");
   const imageName = getValues("image_name");
@@ -302,8 +307,46 @@ const PostUpdate = () => {
         <div className="form-layout">
           <Field>
             <Label>Feature post</Label>
-            <Toggle on={watchHot === true}></Toggle>
+            <Toggle
+              on={watchHot === true}
+              onClick={
+                userInfo.role === userRole.ADMIN
+                  ? () => setValue("hot", !watchHot)
+                  : () => {}
+              }
+            ></Toggle>
           </Field>
+          {userInfo.role === userRole.ADMIN && (
+            <Field>
+              <Label>Status</Label>
+              <FieldCheckboxes>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === postStatus.APPROVED}
+                  value={postStatus.APPROVED}
+                >
+                  Approved
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === postStatus.PENDING}
+                  value={postStatus.PENDING}
+                >
+                  Pending
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === postStatus.REJECTED}
+                  value={postStatus.REJECTED}
+                >
+                  Reject
+                </Radio>
+              </FieldCheckboxes>
+            </Field>
+          )}
         </div>
         <Button
           type="submit"
