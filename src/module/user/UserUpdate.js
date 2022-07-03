@@ -23,7 +23,6 @@ import { userRole, userStatus } from "utils/constants";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import slugify from "slugify";
-import Swal from "sweetalert2";
 import { useAuth } from "contexts/auth-context";
 
 const schema = yup.object({
@@ -83,11 +82,6 @@ const UserUpdate = () => {
 
   const handleUpdateUser = async (values) => {
     if (!isValid) return;
-
-    if (userInfo?.role !== userRole.ADMIN) {
-      Swal.fire("Failed", "You have no right to do this action", "warning");
-      return;
-    }
 
     const newValues = { ...values };
     newValues.username = slugify(newValues.username || newValues.fullname, {
@@ -242,66 +236,124 @@ const UserUpdate = () => {
             ></Input>
           </Field>
         </div>
-        <div className="form-layout">
-          <Field>
-            <Label>Status</Label>
-            <FieldCheckboxes>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === userStatus.ACTIVE}
-                value={userStatus.ACTIVE}
-              >
-                Active
-              </Radio>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === userStatus.PENDING}
-                value={userStatus.PENDING}
-              >
-                Pending
-              </Radio>
-              <Radio
-                name="status"
-                control={control}
-                checked={Number(watchStatus) === userStatus.BAN}
-                value={userStatus.BAN}
-              >
-                Banned
-              </Radio>
-            </FieldCheckboxes>
-          </Field>
-          <Field>
-            <Label>Role</Label>
-            <FieldCheckboxes>
-              <Radio
-                name="role"
-                control={control}
-                checked={Number(watchRole) === userRole.ADMIN}
-                value={userRole.ADMIN}
-              >
-                Admin
-              </Radio>
-              <Radio
-                name="role"
-                control={control}
-                checked={Number(watchRole) === userRole.MOD}
-                value={userRole.MOD}
-              >
-                Moderator
-              </Radio>
-              <Radio
-                name="role"
-                control={control}
-                checked={Number(watchRole) === userRole.USER}
-                value={userRole.USER}
-              >
-                User
-              </Radio>
-            </FieldCheckboxes>
-          </Field>
-        </div>
+        {userInfo.role === userRole.ADMIN && (
+          <div className="form-layout">
+            <Field>
+              <Label>Status</Label>
+              <FieldCheckboxes>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === userStatus.ACTIVE}
+                  value={userStatus.ACTIVE}
+                >
+                  Active
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === userStatus.PENDING}
+                  value={userStatus.PENDING}
+                >
+                  Pending
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === userStatus.BAN}
+                  value={userStatus.BAN}
+                >
+                  Banned
+                </Radio>
+              </FieldCheckboxes>
+            </Field>
+            <Field>
+              <Label>Role</Label>
+              <FieldCheckboxes>
+                <Radio
+                  name="role"
+                  control={control}
+                  checked={Number(watchRole) === userRole.ADMIN}
+                  value={userRole.ADMIN}
+                >
+                  Admin
+                </Radio>
+                <Radio
+                  name="role"
+                  control={control}
+                  checked={Number(watchRole) === userRole.MOD}
+                  value={userRole.MOD}
+                >
+                  Moderator
+                </Radio>
+                <Radio
+                  name="role"
+                  control={control}
+                  checked={Number(watchRole) === userRole.USER}
+                  value={userRole.USER}
+                >
+                  User
+                </Radio>
+              </FieldCheckboxes>
+            </Field>
+          </div>
+        )}
+        {userInfo.role !== userRole.ADMIN && (
+          <div className="form-layout">
+            <Field>
+              <Label>Status</Label>
+              <FieldCheckboxes>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === userStatus.ACTIVE}
+                >
+                  Active
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === userStatus.PENDING}
+                >
+                  Pending
+                </Radio>
+                <Radio
+                  name="status"
+                  control={control}
+                  checked={Number(watchStatus) === userStatus.BAN}
+                >
+                  Banned
+                </Radio>
+              </FieldCheckboxes>
+            </Field>
+            <Field>
+              <Label>Role</Label>
+              <FieldCheckboxes>
+                <Radio
+                  name="role"
+                  control={control}
+                  checked={Number(watchRole) === userRole.ADMIN}
+                >
+                  Admin
+                </Radio>
+                <Radio
+                  name="role"
+                  control={control}
+                  checked={Number(watchRole) === userRole.MOD}
+                >
+                  Moderator
+                </Radio>
+                <Radio
+                  name="role"
+                  control={control}
+                  checked={Number(watchRole) === userRole.USER}
+                >
+                  User
+                </Radio>
+              </FieldCheckboxes>
+            </Field>
+          </div>
+        )}
         <div className="form-layout">
           <Field>
             <Label htmlFor="description">Description</Label>
